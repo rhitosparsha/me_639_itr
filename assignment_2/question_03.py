@@ -26,6 +26,6 @@ d3 = float(input("Enter extension length (m): "))
 x, y, z = scara_fwd_kin(q1, q2, l1, l2, d3)
 
 print("\nEnd effector position :")
-print("x = ", str(x)," m, y = ",str(y), " m, z = ", str(z), " m")
+print(str(x) + " \033[1mi\033[0m + " + str(y) + " \033[1mj\033[0m + " + str(z) + " \033[1mk\033[0m ")
 
 input()
