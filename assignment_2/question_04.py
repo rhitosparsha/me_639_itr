@@ -50,6 +50,6 @@ d3 = float(input("Enter extension length (m): "))
 pos = stanford_fwd_kin(q1, q2, l1, l2, l3, d3)
 
 print("\nEnd effector position :")
-print("x = ", str(pos[0])," m, y = ",str(pos[1]), " m, z = ", str(pos[2]), " m")
+print(str(pos[0]) + " \033[1mi\033[0m + " + str(pos[1]) + " \033[1mj\033[0m + " + str(pos[2]) + " \033[1mk\033[0m ")
 
 input()
