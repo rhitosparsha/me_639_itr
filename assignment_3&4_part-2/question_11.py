@@ -14,11 +14,11 @@ V = sp.Matrix([0] * n)
 print("\nEnter the values for the D(q) matrix : ")
 for i in range(n):
     for j in range(n):
-        D[i, j] = sp.simplify(sp.sympify(input(f"Enter the D({i+1},{j+1})(q) expression: ")))
+        D[i, j] = sp.simplify(sp.sympify(input(f"Enter the D({i},{j})(q) expression: ")))
 
 print("\nEnter the values for the V(q) matrix : ")
 for i in range(n):
-    V[i] = sp.simplify(sp.sympify(input(f"Enter the V({i+1})(q) expression: ")))
+    V[i] = sp.simplify(sp.sympify(input(f"Enter the V({i})(q) expression: ")))
 
 # Compute the Lagrangian L = 0.5*qd^T * D(q) * qd - V(q)^T * q
 L = 0.5 * qd.dot(D * qd) - V.dot(q)
@@ -28,6 +28,12 @@ eqns = [sp.Eq(sp.diff(L, qd[i]) - sp.diff(L, q[i]), tau[i]) for i in range(n)]
 
 # Simplify the equations
 eqns = [sp.simplify(eqn) for eqn in eqns]
+
+# Print the matrices
+print("\nD(q) matrix:")
+print(D)
+print("\nV(q) matrix:")
+print(V)
 
 # Print the equations
 print("\nEquations of motion for the robot:")
