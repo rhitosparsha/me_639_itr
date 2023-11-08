@@ -7,7 +7,7 @@ print("Select Control Scheme :\n1. Simple PD Control\n2. PD Control with Gravity
 choice = input("\nPress a button from 1 - 4 : ")
 print("You chose: ")
 if choice == '1':
-        print("Simple PD Control")
+    print("Simple PD Control")
 elif choice == '2':
     print("PD Control with Gravity Compensation")
 elif choice == '3':
