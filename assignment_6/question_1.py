@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from scipy.optimize import minimize
 
 l1 = 1
 l2 = 1
@@ -15,29 +16,10 @@ def jaco_3(th1, th2, th3):
                    l3 * np.cos(th1 + th2 + th3)]])
     return J
 
-def inv_kin(x, y, phi):
-    # Calculate the distance from the origin to the end effector position
-    r = np.sqrt(x**2 + y**2)
-    print(r)
-    # Calculate the angles using the law of cosines
-    cos_theta3 = (r**2 - l2**2 - l3**2) / (2 * l2 * l3)
-    theta3 = np.arccos(cos_theta3)
-
-    #phi = np.arctan2(y, x)
-
-    cos_alpha = (r**2 + l2**2 - l3**2) / (2 * r * l2)
-    alpha = np.arccos(cos_alpha)
-
-    # Calculate joint angles
-    theta1 = phi - alpha
-    theta2 = np.arctan2(y - l1 * np.sin(theta1), x - l1 * np.cos(theta1)) - theta1
-
-    return theta1, theta2, theta3
-
-def fwd_kin3(q):
+def fwd_kin(q):
     x = l1 * np.cos(q[0]) + l2 * np.cos(q[0] + q[1]) + l3 * np.cos(q[0] + q[1] + q[2])
     y = l1 * np.sin(q[0]) + l2 * np.sin(q[0] + q[1]) + l3 * np.sin(q[0] + q[1] + q[2])
-    return x, y
+    return np.array([x, y])
 
 def animate_3r(q, xt, yt):
     fig, ax = plt.subplots()
@@ -83,7 +65,7 @@ def animate_3r(q, xt, yt):
 
         return line, point
 
-    ani = FuncAnimation(fig, update, frames=len(q[0]), init_func=init, blit=True, interval = 0.00000000001)
+    ani = FuncAnimation(fig, update, frames=len(q[0]), init_func=init, blit=True, interval = 0.1)
     plt.xlim(-3.5, 3.5)
     plt.ylim(-3.5, 3.5)
     plt.gca().set_aspect('equal', adjustable='box')
@@ -108,10 +90,32 @@ dy = np.diff(y) / dt
 v = np.array([dx, dy])
 
 q = np.zeros((3, len(t)))
-q[:, 0] = np.array(inv_kin(1.5, 0, np.pi/16))
-#q[:, 0] = [0,0,0]
-print(q[:, 0])
 
+# Since the trajectory is highly dependent on the initial conditions, implement a minimisation algorithm
+# that optimises the joint angles so that the manipulator starts at point (1.5, 0)
+
+# Function to minimize
+def objective_function(q, *args):
+    target_point = args
+    end_effector = fwd_kin(q)
+    error = np.linalg.norm(target_point - end_effector)
+    return error
+
+# Initial joint angles
+initial_angles = np.array([0.5, 0.5, 0.5])
+
+# Target point
+target = np.array([1.5, 0])
+
+# BFGS minimization
+result = minimize(objective_function, initial_angles, args=target, method='BFGS')
+
+# Extract optimized joint angles
+optimized_angles = result.x
+
+print(optimized_angles)
+
+q[:, 0] = np.array(optimized_angles)
 
 for k in range(len(t)-1):
     th1, th2, th3 = q[:, k]
